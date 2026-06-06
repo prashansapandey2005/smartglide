@@ -3,6 +3,13 @@
 import { db } from "./db";
 import { revalidatePath } from "next/cache";
 
+export async function getPopularCourses() {
+  return await db.course.findMany({
+    take: 6,
+    orderBy: { createdAt: 'desc' }
+  });
+}
+
 export async function getPurchasedCourses(courseIds: string[]) {
   return await db.course.findMany({
     where: {

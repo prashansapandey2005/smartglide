@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useMockAuth } from "@/context/MockAuthContext";
 import { useRouter } from "next/navigation";
 
 interface BuyCourseButtonProps {
@@ -11,7 +11,7 @@ interface BuyCourseButtonProps {
 
 export function BuyCourseButton({ courseId, price }: BuyCourseButtonProps) {
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const { user } = useMockAuth();
   const router = useRouter();
 
   const handlePayment = async () => {
@@ -26,7 +26,7 @@ export function BuyCourseButton({ courseId, price }: BuyCourseButtonProps) {
       const res = await fetch("/api/razorpay/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId, amount: price, userId: user.uid }),
+        body: JSON.stringify({ courseId, amount: price, userId: user.id }),
       });
       const data = await res.json();
 
@@ -37,21 +37,21 @@ export function BuyCourseButton({ courseId, price }: BuyCourseButtonProps) {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "dummy_key", 
         amount: data.order.amount,
         currency: "INR",
-        name: "Apna College Clone",
+        name: "EduCoach",
         description: "Course Purchase",
         order_id: data.order.id,
         handler: function (response: any) {
           // Razorpay returns payment_id, order_id, signature. 
           // The Webhook on the backend will actually unlock the course!
           alert("Payment Successful! Your course is now unlocked.");
-          router.push("/lms");
+          router.push("/dashboard");
         },
         prefill: {
           email: user.email,
-          name: user.displayName,
+          name: user.name,
         },
         theme: {
-          color: "#2563EB", // Blue-600
+          color: "#4F46E5", // Indigo-600
         },
       };
 
@@ -71,13 +71,12 @@ export function BuyCourseButton({ courseId, price }: BuyCourseButtonProps) {
 
   return (
     <>
-      {/* Load Razorpay SDK */}
       <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
       
       <button 
         onClick={handlePayment} 
         disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105 disabled:opacity-50"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-sm transition-transform hover:scale-[1.02] disabled:opacity-50"
       >
         {loading ? "Processing..." : `Enroll Now for ₹${price}`}
       </button>

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
+import { getPopularCourses } from "@/lib/actions";
 import { BuyCourseButton } from "@/components/payments/BuyCourseButton";
 import { BookOpen, Star, Clock } from "lucide-react";
 
@@ -14,13 +13,7 @@ export function CoursesList() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // Temporarily remove orderBy to rule out missing index errors
-        const q = query(collection(db, "courses"), limit(6));
-        const snapshot = await getDocs(q);
-        const fetchedCourses = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const fetchedCourses = await getPopularCourses();
         setCourses(fetchedCourses);
       } catch (error: any) {
         console.error("Error fetching courses:", error);
