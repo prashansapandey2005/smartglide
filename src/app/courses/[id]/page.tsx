@@ -14,7 +14,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   }
 
   // Parse JSON arrays for the UI
-  const course = {
+  const course: any = {
     ...dbCourse,
     tags: JSON.parse(dbCourse.tags as string),
     features: JSON.parse(dbCourse.features as string),
