@@ -22,11 +22,20 @@ export async function getAdminCourses() {
   return await db.course.findMany({
     include: {
       sections: {
+        orderBy: { order: 'asc' },
         include: {
-          topics: true
+          topics: {
+            orderBy: { order: 'asc' },
+            include: {
+              contents: {
+                orderBy: { order: 'asc' }
+              }
+            }
+          }
         }
       }
-    }
+    },
+    orderBy: { createdAt: 'desc' }
   });
 }
 
@@ -38,7 +47,12 @@ export async function getCourseWithSyllabus(courseId: string) {
         orderBy: { order: 'asc' },
         include: {
           topics: {
-            orderBy: { order: 'asc' }
+            orderBy: { order: 'asc' },
+            include: {
+              contents: {
+                orderBy: { order: 'asc' }
+              }
+            }
           }
         }
       }
@@ -46,31 +60,59 @@ export async function getCourseWithSyllabus(courseId: string) {
   });
 }
 
-export async function uploadVideoToTopic(topicId: string, filePath: string) {
-  try {
-    await db.topic.update({
-      where: { id: topicId },
-      data: { videoUrl: filePath },
-    });
-    
-    // Revalidate paths so the UI updates
-    revalidatePath("/admin");
-    revalidatePath("/courses/[id]", "page");
-    revalidatePath("/learn/[id]", "page");
-    
-    return { success: true };
-  } catch (error) {
-    console.error("Error saving video URL to DB:", error);
-    return { success: false, error: "Failed to save to database" };
-  }
+export async function createCourse(data: any) {
+  const course = await db.course.create({
+    data: {
+      title: data.title,
+      description: data.description,
+      longDescription: data.longDescription,
+      price: parseFloat(data.price),
+      originalPrice: parseFloat(data.originalPrice),
+      instructor: data.instructor,
+      tags: JSON.stringify(data.tags),
+      features: JSON.stringify(data.features),
+      imageUrl: data.imageUrl,
+    }
+  });
+  revalidatePath("/admin");
+  revalidatePath("/courses");
+  return course;
+}
+
+export async function addSection(courseId: string, title: string) {
+  const section = await db.section.create({
+    data: {
+      title,
+      courseId,
+    }
+  });
+  revalidatePath("/admin");
+  return section;
+}
+
+export async function addTopic(sectionId: string, title: string) {
+  const topic = await db.topic.create({
+    data: {
+      title,
+      sectionId,
+    }
+  });
+  revalidatePath("/admin");
+  return topic;
 }
 
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 
-export async function uploadVideoAction(formData: FormData, topicId: string) {
+export async function addContent(formData: FormData) {
   const file = formData.get("file") as File;
-  if (!file) throw new Error("No file uploaded");
+  const topicId = formData.get("topicId") as string;
+  const title = formData.get("title") as string;
+  const type = formData.get("type") as string; // "VIDEO" or "PDF"
+
+  if (!file || !topicId || !title || !type) {
+    throw new Error("Missing required fields");
+  }
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
@@ -85,6 +127,37 @@ export async function uploadVideoAction(formData: FormData, topicId: string) {
 
   await writeFile(filePath, buffer);
 
-  await uploadVideoToTopic(topicId, uniqueFilename);
-  return { success: true, filePath: uniqueFilename };
+  const content = await db.content.create({
+    data: {
+      title,
+      type,
+      url: uniqueFilename,
+      topicId,
+    }
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/courses/[id]", "page");
+  revalidatePath("/learn/[id]", "page");
+  return content;
+}
+
+export async function uploadImageAction(formData: FormData) {
+  const file = formData.get("file") as File;
+  if (!file) throw new Error("No file uploaded");
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const uploadDir = join(process.cwd(), "public", "uploads");
+  try {
+    await mkdir(uploadDir, { recursive: true });
+  } catch (e) {}
+
+  const uniqueFilename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+  const filePath = join(uploadDir, uniqueFilename);
+
+  await writeFile(filePath, buffer);
+
+  return `/uploads/${uniqueFilename}`;
 }
