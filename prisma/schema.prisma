@@ -1,0 +1,64 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String       @id @default(cuid())
+  email            String       @unique
+  name             String?
+  role             String       @default("student") // 'student' or 'admin'
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  enrollments      Enrollment[]
+}
+
+model Course {
+  id               String       @id @default(cuid())
+  title            String
+  description      String       @db.Text
+  longDescription  String       @db.Text
+  price            Float
+  originalPrice    Float
+  instructor       String
+  tags             String       // Stored as JSON string array
+  features         String       @db.Text // Stored as JSON string array
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  sections         Section[]
+  enrollments      Enrollment[]
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  title     String
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
+  topics    Topic[]
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  title     String
+  sectionId String
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
+  videoUrl  String?  @db.Text // Internal path to private video
+  pdfUrl    String?  @db.Text // Internal path to private pdf
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
