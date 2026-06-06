@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useMockAuth } from "@/context/MockAuthContext";
 import { Lock, Users, CreditCard, TrendingUp, Plus, Edit, Video, CheckCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { getAdminCourses, uploadVideoToTopic } from "@/lib/actions";
+import { getAdminCourses, uploadVideoToTopic, uploadVideoAction } from "@/lib/actions";
 
 export default function AdminDashboard() {
   const { user, isLoading } = useMockAuth();
@@ -32,22 +32,14 @@ export default function AdminDashboard() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        await uploadVideoToTopic(topicId, data.filePath);
-        await fetchCourses();
-        alert("Video uploaded and secured successfully!");
-      } else {
-        alert("Upload failed: " + data.message);
-      }
-    } catch (err) {
+      // Use Next.js Server Action to bypass standard API route limits
+      await uploadVideoAction(formData, topicId);
+      
+      await fetchCourses();
+      alert("Video uploaded and secured successfully!");
+    } catch (err: any) {
       console.error(err);
-      alert("An error occurred during upload.");
+      alert("Upload failed: " + (err.message || "Server error"));
     } finally {
       setUploadingTopic(null);
     }

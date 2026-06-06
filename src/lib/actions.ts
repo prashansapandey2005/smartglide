@@ -64,3 +64,27 @@ export async function uploadVideoToTopic(topicId: string, filePath: string) {
     return { success: false, error: "Failed to save to database" };
   }
 }
+
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
+
+export async function uploadVideoAction(formData: FormData, topicId: string) {
+  const file = formData.get("file") as File;
+  if (!file) throw new Error("No file uploaded");
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const uploadDir = join(process.cwd(), "private", "uploads");
+  try {
+    await mkdir(uploadDir, { recursive: true });
+  } catch (e) {}
+
+  const uniqueFilename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+  const filePath = join(uploadDir, uniqueFilename);
+
+  await writeFile(filePath, buffer);
+
+  await uploadVideoToTopic(topicId, uniqueFilename);
+  return { success: true, filePath: uniqueFilename };
+}
