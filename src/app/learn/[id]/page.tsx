@@ -17,7 +17,7 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     params.then(async (resolvedParams) => {
-      const fetchedCourse = await getCourseWithSyllabus(resolvedParams.id);
+      const fetchedCourse: any = await getCourseWithSyllabus(resolvedParams.id);
       setCourse(fetchedCourse);
       
       // Auto-select the first content of the first topic if available
