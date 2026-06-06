@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createReadStream, statSync } from 'fs';
 import { join } from 'path';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ videoId: string }> }) {
+export async function GET(request: NextRequest, context: any) {
   try {
-    const resolvedParams = await params;
-    const videoId = resolvedParams.videoId;
+    const params = await context.params;
+    const videoId = params.videoId;
     
     // In a real app, verify the user's session and check if they purchased the course here!
     // For MVP, we will allow streaming if the ID is valid.

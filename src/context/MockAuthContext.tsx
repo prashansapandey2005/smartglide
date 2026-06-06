@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 type UserRole = "student" | "admin" | null;
 
 interface User {
+  id: string;
   name: string;
   email: string;
   role: UserRole;
@@ -38,6 +39,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginAsStudent = () => {
     const studentUser: User = {
+      id: "student-123",
       name: "Student User",
       email: "student@example.com",
       role: "student",
@@ -50,6 +52,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginAsAdmin = () => {
     const adminUser: User = {
+      id: "admin-456",
       name: "Admin User",
       email: "admin@educoach.com",
       role: "admin",
