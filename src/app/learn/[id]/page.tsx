@@ -70,7 +70,7 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
               activeContent.type === "VIDEO" ? (
                 <div className="flex-1 relative aspect-video flex items-center justify-center max-h-[70vh]">
                   <video 
-                    src={`/api/stream/${activeContent.url}`} 
+                    src={activeContent.url} 
                     controls 
                     controlsList="nodownload" 
                     onContextMenu={(e) => e.preventDefault()}
@@ -85,7 +85,7 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
                   <FileText className="w-24 h-24 text-orange-500 mb-6" />
                   <h2 className="text-2xl font-bold text-white mb-2">{activeContent.title}</h2>
                   <p className="text-gray-400 mb-8 max-w-md">This is a PDF document. You can download it below to view it.</p>
-                  <a href={`/api/stream/${activeContent.url}`} download={`${activeContent.title}.pdf`} className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors">
+                  <a href={activeContent.url} download={`${activeContent.title}.pdf`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors">
                     <Download className="w-5 h-5" /> Download PDF Notes
                   </a>
                 </div>

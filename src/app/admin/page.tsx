@@ -4,17 +4,17 @@ import React, { useEffect, useState } from "react";
 import { useMockAuth } from "@/context/MockAuthContext";
 import { Lock, Users, CreditCard, TrendingUp, Plus, Edit, Video, FileText, CheckCircle, Loader2, BookOpen } from "lucide-react";
 import Link from "next/link";
-import { getAdminCourses, addContent, addSection, addTopic, createCourse, uploadImageAction } from "@/lib/actions";
+import { getAdminCourses, addContent, addSection, addTopic, createCourse } from "@/lib/actions";
+import { UploadButton } from "@/utils/uploadthing";
 
 export default function AdminDashboard() {
   const { user, isLoading } = useMockAuth();
   const [mounted, setMounted] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
-  const [uploadingTopic, setUploadingTopic] = useState<string | null>(null);
 
   const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [courseForm, setCourseForm] = useState({
     title: "", description: "", longDescription: "", price: "0", originalPrice: "0", instructor: "", tags: "", features: ""
   });
@@ -33,18 +33,11 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      let imageUrl = null;
-      if (coverImageFile) {
-        const formData = new FormData();
-        formData.append("file", coverImageFile);
-        imageUrl = await uploadImageAction(formData);
-      }
-      
       await createCourse({
         ...courseForm,
         tags: courseForm.tags.split(",").map(t => t.trim()),
         features: courseForm.features.split("\n").filter(f => f.trim() !== ""),
-        imageUrl,
+        imageUrl: coverImageUrl,
       });
       setShowCreateCourse(false);
       await fetchCourses();
@@ -71,28 +64,15 @@ export default function AdminDashboard() {
     fetchCourses();
   };
 
-  const handleContentUpload = async (e: React.ChangeEvent<HTMLInputElement>, topicId: string, type: "VIDEO" | "PDF") => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingTopic(topicId);
-    
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("topicId", topicId);
-    formData.append("type", type);
-    const title = prompt(`Enter title for this ${type}:`) || `${type} File`;
-    formData.append("title", title);
-
+  const handleContentUploadFromUrl = async (topicId: string, type: "VIDEO" | "PDF", url: string, rawName: string) => {
+    const title = prompt(`Enter title for this ${type}:`, rawName) || `${type} File`;
     try {
-      await addContent(formData);
+      await addContent({ topicId, type, url, title });
       await fetchCourses();
-      alert(`${type} uploaded successfully!`);
+      alert(`${type} saved successfully!`);
     } catch (err: any) {
       console.error(err);
-      alert("Upload failed: " + (err.message || "Server error"));
-    } finally {
-      setUploadingTopic(null);
+      alert("Save failed: " + (err.message || "Server error"));
     }
   };
 
@@ -148,7 +128,22 @@ export default function AdminDashboard() {
                 <textarea placeholder="Features (one per line)" className="w-full p-3 border rounded-xl" value={courseForm.features} onChange={e => setCourseForm({...courseForm, features: e.target.value})} />
                 <div>
                   <label className="block text-sm font-medium mb-2">Course Cover Image (Optional)</label>
-                  <input type="file" accept="image/*" onChange={e => setCoverImageFile(e.target.files?.[0] || null)} className="w-full p-2 border rounded-xl" />
+                  {coverImageUrl ? (
+                    <div className="flex items-center gap-4">
+                      <img src={coverImageUrl} alt="Cover" className="h-16 w-16 object-cover rounded" />
+                      <button type="button" onClick={() => setCoverImageUrl(null)} className="text-sm text-red-500">Remove</button>
+                    </div>
+                  ) : (
+                    <UploadButton
+                      endpoint="courseImage"
+                      onClientUploadComplete={(res) => {
+                        if (res?.[0]) setCoverImageUrl(res[0].url);
+                      }}
+                      onUploadError={(error: Error) => {
+                        alert(`ERROR! ${error.message}`);
+                      }}
+                    />
+                  )}
                 </div>
               </div>
               <div className="flex gap-4 mt-8">
@@ -214,22 +209,40 @@ export default function AdminDashboard() {
                         
                         {section.topics.map((topic: any) => (
                           <div key={topic.id} className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
                               <h4 className="font-semibold text-gray-800">{topic.title}</h4>
-                              <div className="flex gap-2">
-                                <label className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${uploadingTopic === topic.id ? 'bg-gray-100 text-gray-400' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}>
-                                  <Video className="w-3.5 h-3.5" /> + Video
-                                  <input type="file" accept="video/*" className="hidden" disabled={uploadingTopic !== null} onChange={(e) => handleContentUpload(e, topic.id, "VIDEO")} />
-                                </label>
-                                <label className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${uploadingTopic === topic.id ? 'bg-gray-100 text-gray-400' : 'bg-orange-50 text-orange-700 hover:bg-orange-100'}`}>
-                                  <FileText className="w-3.5 h-3.5" /> + PDF
-                                  <input type="file" accept="application/pdf" className="hidden" disabled={uploadingTopic !== null} onChange={(e) => handleContentUpload(e, topic.id, "PDF")} />
-                                </label>
+                              <div className="flex flex-wrap gap-4 items-center">
+                                <div className="bg-white p-2 border rounded-xl shadow-sm">
+                                  <span className="text-xs font-bold text-indigo-500 mb-1 block uppercase tracking-wider">+ Video Upload</span>
+                                  <UploadButton
+                                    endpoint="courseVideo"
+                                    onClientUploadComplete={(res) => {
+                                      if(res?.[0]) handleContentUploadFromUrl(topic.id, "VIDEO", res[0].url, res[0].name);
+                                    }}
+                                    onUploadError={(error: Error) => {
+                                      alert(`ERROR! ${error.message}`);
+                                    }}
+                                    appearance={{ button: { padding: '4px 8px', fontSize: '12px' } }}
+                                  />
+                                </div>
+                                <div className="bg-white p-2 border rounded-xl shadow-sm">
+                                  <span className="text-xs font-bold text-orange-500 mb-1 block uppercase tracking-wider">+ PDF Upload</span>
+                                  <UploadButton
+                                    endpoint="coursePdf"
+                                    onClientUploadComplete={(res) => {
+                                      if(res?.[0]) handleContentUploadFromUrl(topic.id, "PDF", res[0].url, res[0].name);
+                                    }}
+                                    onUploadError={(error: Error) => {
+                                      alert(`ERROR! ${error.message}`);
+                                    }}
+                                    appearance={{ button: { padding: '4px 8px', fontSize: '12px', background: '#f97316' } }}
+                                  />
+                                </div>
                               </div>
                             </div>
                             
                             {/* Contents inside topic */}
-                            <div className="space-y-2">
+                            <div className="space-y-2 mt-4">
                               {topic.contents?.length === 0 && <div className="text-xs text-gray-400">No content uploaded yet.</div>}
                               {topic.contents?.map((content: any) => (
                                 <div key={content.id} className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg p-2.5 text-sm">

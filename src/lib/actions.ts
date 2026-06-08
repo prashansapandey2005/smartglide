@@ -101,38 +101,17 @@ export async function addTopic(sectionId: string, title: string) {
   return topic;
 }
 
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-
-export async function addContent(formData: FormData) {
-  const file = formData.get("file") as File;
-  const topicId = formData.get("topicId") as string;
-  const title = formData.get("title") as string;
-  const type = formData.get("type") as string; // "VIDEO" or "PDF"
-
-  if (!file || !topicId || !title || !type) {
+export async function addContent(data: { title: string, type: string, url: string, topicId: string }) {
+  if (!data.url || !data.topicId || !data.title || !data.type) {
     throw new Error("Missing required fields");
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  const uploadDir = join(process.cwd(), "private", "uploads");
-  try {
-    await mkdir(uploadDir, { recursive: true });
-  } catch (e) {}
-
-  const uniqueFilename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-  const filePath = join(uploadDir, uniqueFilename);
-
-  await writeFile(filePath, buffer);
-
   const content = await db.content.create({
     data: {
-      title,
-      type,
-      url: uniqueFilename,
-      topicId,
+      title: data.title,
+      type: data.type,
+      url: data.url,
+      topicId: data.topicId,
     }
   });
 
@@ -140,24 +119,4 @@ export async function addContent(formData: FormData) {
   revalidatePath("/courses/[id]", "page");
   revalidatePath("/learn/[id]", "page");
   return content;
-}
-
-export async function uploadImageAction(formData: FormData) {
-  const file = formData.get("file") as File;
-  if (!file) throw new Error("No file uploaded");
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  const uploadDir = join(process.cwd(), "public", "uploads");
-  try {
-    await mkdir(uploadDir, { recursive: true });
-  } catch (e) {}
-
-  const uniqueFilename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-  const filePath = join(uploadDir, uniqueFilename);
-
-  await writeFile(filePath, buffer);
-
-  return `/uploads/${uniqueFilename}`;
 }
