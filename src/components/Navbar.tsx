@@ -29,65 +29,68 @@ export function Navbar() {
             <Link href="/courses" className="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Courses</Link>
             <Link href="/about" className="text-gray-600 hover:text-indigo-600 transition-colors font-medium">About</Link>
             
-            {!isLoading && (
-              <div className="flex items-center gap-4 border-l border-gray-200 pl-8">
-                {user ? (
-                  <div className="relative">
-                    <button 
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="flex items-center gap-2 focus:outline-none"
-                    >
-                      <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" />
-                      <span className="text-sm font-medium text-gray-700">{user.name}</span>
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    </button>
-                    
-                    {/* Dropdown Menu */}
-                    <AnimatePresence>
-                      {isDropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1"
+            <div className="flex items-center gap-4 border-l border-gray-200 pl-8">
+              {isLoading ? (
+                <div className="flex gap-3">
+                  <div className="w-24 h-9 bg-gray-200 animate-pulse rounded-lg"></div>
+                  <div className="w-24 h-9 bg-gray-200 animate-pulse rounded-lg"></div>
+                </div>
+              ) : user ? (
+                <div className="relative">
+                  <button 
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center gap-2 focus:outline-none"
+                  >
+                    <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" />
+                    <span className="text-sm font-medium text-gray-700">{user.name}</span>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  <AnimatePresence>
+                    {isDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1"
+                      >
+                        {user.role === 'admin' ? (
+                          <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                            <Settings className="w-4 h-4" /> Admin Dashboard
+                          </Link>
+                        ) : (
+                          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                            <LayoutDashboard className="w-4 h-4" /> My Courses
+                          </Link>
+                        )}
+                        <button 
+                          onClick={logout}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                         >
-                          {user.role === 'admin' ? (
-                            <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                              <Settings className="w-4 h-4" /> Admin Dashboard
-                            </Link>
-                          ) : (
-                            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                              <LayoutDashboard className="w-4 h-4" /> My Courses
-                            </Link>
-                          )}
-                          <button 
-                            onClick={logout}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                          >
-                            <LogOut className="w-4 h-4" /> Logout
-                          </button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={loginAsStudent}
-                      className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2"
-                    >
-                      Login (Student)
-                    </button>
-                    <button 
-                      onClick={loginAsAdmin}
-                      className="text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors"
-                    >
-                      Login (Admin)
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+                          <LogOut className="w-4 h-4" /> Logout
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={loginAsStudent}
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2"
+                  >
+                    Login (Student)
+                  </button>
+                  <button 
+                    onClick={loginAsAdmin}
+                    className="text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Login (Admin)
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
