@@ -5,6 +5,8 @@ import Link from "next/link";
 import { PricingCard } from "@/components/PricingCard";
 import { getCourseWithSyllabus } from "@/lib/actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const dbCourse = await getCourseWithSyllabus(resolvedParams.id);

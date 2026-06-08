@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { CourseCard } from "@/components/CourseCard";
 import { Search } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 // Server Component
 export default async function CoursesPage() {
   const dbCourses = await db.course.findMany();
