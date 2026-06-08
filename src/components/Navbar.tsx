@@ -120,42 +120,45 @@ export function Navbar() {
               
               <div className="h-px bg-gray-200 w-full my-2"></div>
               
-              {!isLoading && (
-                user ? (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3 px-2">
-                      <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-full" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                        <p className="text-xs text-gray-500 capitalize">{user.role}</p>
-                      </div>
+              {isLoading ? (
+                <div className="flex flex-col gap-3 px-2">
+                  <div className="w-full h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+                  <div className="w-full h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+                </div>
+              ) : user ? (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3 px-2">
+                    <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-full" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user.role}</p>
                     </div>
-                    {user.role === 'admin' ? (
-                      <Link href="/admin" className="text-gray-700 font-medium px-2 py-1 flex items-center gap-2">
-                        <Settings className="w-4 h-4" /> Admin Dashboard
-                      </Link>
-                    ) : (
-                      <Link href="/dashboard" className="text-gray-700 font-medium px-2 py-1 flex items-center gap-2">
-                        <LayoutDashboard className="w-4 h-4" /> My Courses
-                      </Link>
-                    )}
-                    <button 
-                      onClick={logout}
-                      className="text-red-600 font-medium px-2 py-1 text-left flex items-center gap-2"
-                    >
-                      <LogOut className="w-4 h-4" /> Logout
-                    </button>
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <button onClick={loginAsStudent} className="w-full text-center bg-gray-50 text-gray-800 font-medium py-2 rounded-lg border border-gray-200">
-                      Login as Student
-                    </button>
-                    <button onClick={loginAsAdmin} className="w-full text-center bg-indigo-600 text-white font-medium py-2 rounded-lg">
-                      Login as Admin
-                    </button>
-                  </div>
-                )
+                  {user.role === 'admin' ? (
+                    <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium px-2 py-1 flex items-center gap-2">
+                      <Settings className="w-4 h-4" /> Admin Dashboard
+                    </Link>
+                  ) : (
+                    <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium px-2 py-1 flex items-center gap-2">
+                      <LayoutDashboard className="w-4 h-4" /> My Courses
+                    </Link>
+                  )}
+                  <button 
+                    onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                    className="text-red-600 font-medium px-2 py-1 text-left flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <button onClick={() => { loginAsStudent(); setIsMobileMenuOpen(false); }} className="w-full text-center bg-gray-50 text-gray-800 font-medium py-2 rounded-lg border border-gray-200">
+                    Login as Student
+                  </button>
+                  <button onClick={() => { loginAsAdmin(); setIsMobileMenuOpen(false); }} className="w-full text-center bg-indigo-600 text-white font-medium py-2 rounded-lg">
+                    Login as Admin
+                  </button>
+                </div>
               )}
             </div>
           </motion.div>
