@@ -47,32 +47,25 @@ export function Navbar() {
                   </button>
                   
                   {/* Dropdown Menu */}
-                  <AnimatePresence>
-                    {isDropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1"
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1">
+                      {user.role === 'admin' ? (
+                        <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setIsDropdownOpen(false)}>
+                          <Settings className="w-4 h-4" /> Admin Dashboard
+                        </Link>
+                      ) : (
+                        <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setIsDropdownOpen(false)}>
+                          <LayoutDashboard className="w-4 h-4" /> My Courses
+                        </Link>
+                      )}
+                      <button 
+                        onClick={() => { logout(); setIsDropdownOpen(false); }}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                       >
-                        {user.role === 'admin' ? (
-                          <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                            <Settings className="w-4 h-4" /> Admin Dashboard
-                          </Link>
-                        ) : (
-                          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                            <LayoutDashboard className="w-4 h-4" /> My Courses
-                          </Link>
-                        )}
-                        <button 
-                          onClick={logout}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        >
-                          <LogOut className="w-4 h-4" /> Logout
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        <LogOut className="w-4 h-4" /> Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
