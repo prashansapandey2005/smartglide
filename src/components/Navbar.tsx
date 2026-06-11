@@ -36,36 +36,28 @@ export function Navbar() {
                   <div className="w-24 h-9 bg-gray-200 animate-pulse rounded-lg"></div>
                 </div>
               ) : user ? (
-                <div className="relative">
-                  <button 
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 focus:outline-none"
-                  >
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 mr-2">
                     <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" />
-                    <span className="text-sm font-medium text-gray-700">{user.name}</span>
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  </button>
+                    <span className="text-sm font-bold text-gray-900">{user.name}</span>
+                  </div>
                   
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1">
-                      {user.role === 'admin' ? (
-                        <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setIsDropdownOpen(false)}>
-                          <Settings className="w-4 h-4" /> Admin Dashboard
-                        </Link>
-                      ) : (
-                        <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setIsDropdownOpen(false)}>
-                          <LayoutDashboard className="w-4 h-4" /> My Courses
-                        </Link>
-                      )}
-                      <button 
-                        onClick={() => { logout(); setIsDropdownOpen(false); }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        <LogOut className="w-4 h-4" /> Logout
-                      </button>
-                    </div>
+                  {user.role === 'admin' ? (
+                    <Link href="/admin" className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                      <Settings className="w-4 h-4" /> Admin Dashboard
+                    </Link>
+                  ) : (
+                    <Link href="/dashboard" className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                      <LayoutDashboard className="w-4 h-4" /> My Courses
+                    </Link>
                   )}
+                  
+                  <button 
+                    onClick={() => logout()}
+                    className="text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
