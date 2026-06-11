@@ -10,6 +10,7 @@ generator client {
 model User {
   id               String       @id @default(cuid())
   email            String       @unique
+  password         String?
   name             String?
   role             String       @default("student") // 'student' or 'admin'
   createdAt        DateTime     @default(now())

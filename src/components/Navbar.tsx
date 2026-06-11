@@ -85,18 +85,20 @@ export function Navbar() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
-                  <button 
-                    onClick={() => { loginAsStudent(); setIsMobileMenuOpen(false); }}
+                  <Link 
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="w-full text-center font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-xl transition-colors"
                   >
-                    Login (Student)
-                  </button>
-                  <button 
-                    onClick={() => { loginAsAdmin(); setIsMobileMenuOpen(false); }}
+                    Log In
+                  </Link>
+                  <Link 
+                    href="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="w-full text-center font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-3 rounded-xl transition-colors"
                   >
-                    Login (Admin)
-                  </button>
+                    Sign Up
+                  </Link>
                 </div>
               )}
             </div>

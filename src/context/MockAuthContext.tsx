@@ -1,92 +1,87 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-type UserRole = "student" | "admin" | null;
-
-interface User {
+export type User = {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
-  avatar?: string;
+  role: "student" | "admin";
+  avatar: string;
   purchasedCourses: string[];
-}
+};
 
-interface MockAuthContextType {
+type AuthContextType = {
   user: User | null;
+  isLoading: boolean;
   loginAsStudent: () => void;
   loginAsAdmin: () => void;
   logout: () => void;
   purchaseCourse: (courseId: string) => void;
-  isLoading: boolean;
-}
+};
 
-const MockAuthContext = createContext<MockAuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isLoading: true,
+  loginAsStudent: () => {},
+  loginAsAdmin: () => {},
+  logout: () => {},
+  purchaseCourse: () => {},
+});
 
-export function MockAuthProvider({ children }: { children: React.ReactNode }) {
+export const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  // Simulate loading state from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("mockUser");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      })
+      .catch(() => setUser(null))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const loginAsStudent = () => {
-    const studentUser: User = {
-      id: "student-123",
-      name: "Student User",
-      email: "student@example.com",
-      role: "student",
-      avatar: "https://i.pravatar.cc/150?u=student",
-      purchasedCourses: [],
-    };
-    setUser(studentUser);
-    localStorage.setItem("mockUser", JSON.stringify(studentUser));
+    router.push("/login");
   };
 
   const loginAsAdmin = () => {
-    const adminUser: User = {
-      id: "admin-456",
-      name: "Admin User",
-      email: "admin@educoach.com",
-      role: "admin",
-      avatar: "https://i.pravatar.cc/150?u=admin",
-      purchasedCourses: [],
-    };
-    setUser(adminUser);
-    localStorage.setItem("mockUser", JSON.stringify(adminUser));
+    router.push("/login");
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    localStorage.removeItem("mockUser");
+    router.push("/");
+    router.refresh();
   };
 
   const purchaseCourse = (courseId: string) => {
     if (user && !user.purchasedCourses.includes(courseId)) {
       const updatedUser = { ...user, purchasedCourses: [...user.purchasedCourses, courseId] };
       setUser(updatedUser);
-      localStorage.setItem("mockUser", JSON.stringify(updatedUser));
     }
   };
 
   return (
-    <MockAuthContext.Provider
+    <AuthContext.Provider
       value={{ user, loginAsStudent, loginAsAdmin, logout, purchaseCourse, isLoading }}
     >
       {children}
-    </MockAuthContext.Provider>
+    </AuthContext.Provider>
   );
 }
 
 export function useMockAuth() {
-  const context = useContext(MockAuthContext);
+  const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useMockAuth must be used within a MockAuthProvider");
   }
