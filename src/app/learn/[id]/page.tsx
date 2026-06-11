@@ -52,11 +52,11 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-300 pt-16">
-      <div className="flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
+      <div className="flex flex-row min-h-[calc(100vh-64px)] overflow-hidden">
         
-        {/* Sidebar Syllabus (Now on the left) */}
-        <div className="w-full md:w-80 lg:w-96 bg-gray-900 border-r border-gray-800 md:h-[calc(100vh-64px)] md:overflow-y-auto shrink-0 flex flex-col order-2 md:order-1">
-          <div className="p-6 border-b border-gray-800 sticky top-0 bg-gray-900 z-10 flex flex-col gap-4">
+        {/* Sidebar Syllabus (Now permanently on the left) */}
+        <div className="w-80 lg:w-96 bg-[#1e1e24] border-r border-gray-800 h-[calc(100vh-64px)] overflow-y-auto shrink-0 flex flex-col">
+          <div className="p-6 border-b border-gray-800 sticky top-0 bg-[#1e1e24] z-10 flex flex-col gap-4">
             <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
               <ArrowLeft className="w-4 h-4" /> Back to course page
             </Link>
@@ -71,8 +71,8 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
           
           <div className="divide-y divide-gray-800">
             {course.sections.map((section: any, idx: number) => (
-              <div key={section.id} className="bg-gray-900">
-                <div className="p-4 font-bold text-sm text-gray-300 bg-gray-800/50 border-b border-gray-800/50">
+              <div key={section.id} className="bg-[#1e1e24]">
+                <div className="p-4 font-bold text-sm text-gray-300 bg-gray-800/30 border-b border-gray-800/30">
                   {idx + 1}. {section.title}
                 </div>
                 <div className="divide-y divide-gray-800/30">
@@ -89,7 +89,7 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
                         </button>
                         
                         {isExpanded && (
-                          <div className="bg-gray-900 pb-2">
+                          <div className="bg-[#1e1e24] pb-2">
                             {topic.contents?.length === 0 && <div className="px-8 py-3 text-xs text-gray-500 italic">No content in this topic.</div>}
                             {topic.contents?.map((content: any) => {
                               const isSelected = activeContent?.id === content.id;
@@ -97,7 +97,7 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
                                 <button 
                                   key={content.id}
                                   onClick={() => setActiveContent(content)}
-                                  className={`w-full text-left pl-8 pr-4 py-2.5 flex items-start gap-3 hover:bg-gray-800 transition-colors ${isSelected ? "border-l-2 border-indigo-500 bg-gray-800/80" : "border-l-2 border-transparent"}`}
+                                  className={`w-full text-left pl-8 pr-4 py-2.5 flex items-start gap-3 hover:bg-gray-800 transition-colors ${isSelected ? "border-l-2 border-indigo-500 bg-gray-800/60" : "border-l-2 border-transparent"}`}
                                 >
                                   {content.type === "VIDEO" ? (
                                     <PlayCircle className={`w-4 h-4 shrink-0 mt-0.5 ${isSelected ? "text-indigo-400" : "text-gray-500"}`} />
@@ -121,13 +121,13 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
           </div>
         </div>
 
-        {/* Main Viewer Area (Now on the right) */}
-        <div className="flex-1 bg-[#1c1d21] flex flex-col order-1 md:order-2 md:h-[calc(100vh-64px)]">
+        {/* Main Viewer Area (Permanently on the right) */}
+        <div className="flex-1 bg-[#2c2e3a] flex flex-col h-[calc(100vh-64px)] overflow-y-auto min-w-0">
           {/* Header */}
-          <div className="p-4 flex items-center justify-between bg-[#1c1d21] border-b border-gray-800 shrink-0">
-            <button className="text-gray-400 hover:text-white text-sm font-medium">&lt; Previous</button>
+          <div className="p-4 flex items-center justify-between bg-[#2c2e3a] border-b border-gray-800 shrink-0">
+            <button className="text-gray-400 hover:text-white text-sm font-medium flex items-center gap-1">&lt; Previous</button>
             <h1 className="text-sm font-bold text-gray-300 line-clamp-1">{activeContent?.title || "Video Player"}</h1>
-            <button className="text-gray-400 hover:text-white text-sm font-medium">Next &gt;</button>
+            <button className="text-gray-400 hover:text-white text-sm font-medium flex items-center gap-1">Next &gt;</button>
           </div>
 
           {/* Secure Content Viewer */}
