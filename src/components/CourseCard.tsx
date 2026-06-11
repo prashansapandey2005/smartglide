@@ -1,8 +1,16 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import { BookOpen, CheckCircle2 } from "lucide-react";
+import { useMockAuth } from "@/context/MockAuthContext";
+import { useRouter } from "next/navigation";
 
 export function CourseCard({ id, title, description, price, originalPrice, tags, isPopular = false }: any) {
+  const { user, purchaseCourse } = useMockAuth();
+  const router = useRouter();
+  const [isProcessing, setIsProcessing] = useState(false);
+
   return (
     <div className="relative bg-white rounded-3xl border border-gray-200 overflow-hidden group hover:border-indigo-300 hover:shadow-xl transition-all duration-300">
       {isPopular && (
@@ -38,9 +46,30 @@ export function CourseCard({ id, title, description, price, originalPrice, tags,
             <span className="text-3xl font-extrabold text-gray-900">{price}</span>
             <span className="text-sm text-gray-400 line-through ml-2">{originalPrice}</span>
           </div>
-          <Link href={`/courses/${id}`} className="px-6 py-3 bg-gray-900 hover:bg-indigo-600 text-white font-semibold rounded-xl transition-colors">
-            View Details
-          </Link>
+          <div className="flex gap-2">
+            <Link href={`/courses/${id}`} className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-xl transition-colors text-sm">
+              Details
+            </Link>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                if (!user) {
+                  alert("Please login first to enroll in this course.");
+                  return;
+                }
+                setIsProcessing(true);
+                setTimeout(() => {
+                  purchaseCourse(id);
+                  setIsProcessing(false);
+                  router.push("/dashboard");
+                }, 1000);
+              }}
+              disabled={isProcessing}
+              className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? "Enrolling..." : "Enroll Now"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
