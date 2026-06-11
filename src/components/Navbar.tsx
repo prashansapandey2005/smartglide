@@ -15,8 +15,6 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="bg-indigo-600 p-2 rounded-lg">
               <Code className="h-5 w-5 text-white" />
@@ -24,65 +22,11 @@ export function Navbar() {
             <span className="text-xl font-bold text-gray-900 tracking-tight">EduCoach</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/courses" className="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Courses</Link>
-            <Link href="/about" className="text-gray-600 hover:text-indigo-600 transition-colors font-medium">About</Link>
-            
-            <div className="flex items-center gap-4 border-l border-gray-200 pl-8">
-              {isLoading ? (
-                <div className="flex gap-3">
-                  <div className="w-24 h-9 bg-gray-200 animate-pulse rounded-lg"></div>
-                  <div className="w-24 h-9 bg-gray-200 animate-pulse rounded-lg"></div>
-                </div>
-              ) : user ? (
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 mr-2">
-                    <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" />
-                    <span className="text-sm font-bold text-gray-900">{user.name}</span>
-                  </div>
-                  
-                  {user.role === 'admin' ? (
-                    <Link href="/admin" className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-                      <Settings className="w-4 h-4" /> Admin Dashboard
-                    </Link>
-                  ) : (
-                    <Link href="/dashboard" className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-                      <LayoutDashboard className="w-4 h-4" /> My Courses
-                    </Link>
-                  )}
-                  
-                  <button 
-                    onClick={() => logout()}
-                    className="text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" /> Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <button 
-                    onClick={loginAsStudent}
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2"
-                  >
-                    Login (Student)
-                  </button>
-                  <button 
-                    onClick={loginAsAdmin}
-                    className="text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors"
-                  >
-                    Login (Admin)
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
+          {/* Persistent Hamburger Menu Button (Always Visible) */}
+          <div className="flex items-center">
+            <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-500 hover:text-gray-900 focus:outline-none p-2"
+              className="text-gray-600 hover:text-gray-900 focus:outline-none p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -90,55 +34,72 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Right-Side Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200">
-          <div className="px-4 pt-2 pb-6 flex flex-col gap-4">
-            <Link href="/courses" className="text-gray-700 font-medium px-2 py-1">Courses</Link>
-            <Link href="/about" className="text-gray-700 font-medium px-2 py-1">About</Link>
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>
+          <div 
+            className="w-64 sm:w-80 h-full bg-white shadow-2xl flex flex-col transform transition-transform" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <span className="font-bold text-gray-900">Menu</span>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-500 hover:text-gray-900">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
             
-            <div className="h-px bg-gray-200 w-full my-2"></div>
-            
-            {isLoading ? (
-              <div className="flex flex-col gap-3 px-2">
-                <div className="w-full h-10 bg-gray-200 animate-pulse rounded-lg"></div>
-                <div className="w-full h-10 bg-gray-200 animate-pulse rounded-lg"></div>
-              </div>
-            ) : user ? (
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-3 px-2">
-                  <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-full" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                    <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+            <div className="p-6 flex flex-col gap-6 overflow-y-auto">
+              <Link href="/courses" className="text-lg font-medium text-gray-700 hover:text-indigo-600" onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
+              <Link href="/about" className="text-lg font-medium text-gray-700 hover:text-indigo-600" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+              
+              <div className="h-px bg-gray-200 my-2"></div>
+              
+              {isLoading ? (
+                <div className="h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+              ) : user ? (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 mb-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-full border border-gray-300" />
+                    <div>
+                      <div className="font-bold text-gray-900">{user.name}</div>
+                      <div className="text-xs text-gray-500 capitalize">{user.role}</div>
+                    </div>
                   </div>
+                  
+                  {user.role === 'admin' ? (
+                    <Link href="/admin" className="flex items-center gap-3 text-gray-700 hover:text-indigo-600 font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Settings className="w-5 h-5 text-indigo-500" /> Admin Dashboard
+                    </Link>
+                  ) : (
+                    <Link href="/dashboard" className="flex items-center gap-3 text-gray-700 hover:text-indigo-600 font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                      <LayoutDashboard className="w-5 h-5 text-indigo-500" /> My Courses
+                    </Link>
+                  )}
+                  
+                  <button 
+                    onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 text-red-600 hover:text-red-700 font-medium mt-2"
+                  >
+                    <LogOut className="w-5 h-5" /> Logout
+                  </button>
                 </div>
-                {user.role === 'admin' ? (
-                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium px-2 py-1 flex items-center gap-2">
-                    <Settings className="w-4 h-4" /> Admin Dashboard
-                  </Link>
-                ) : (
-                  <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium px-2 py-1 flex items-center gap-2">
-                    <LayoutDashboard className="w-4 h-4" /> My Courses
-                  </Link>
-                )}
-                <button 
-                  onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-                  className="text-red-600 font-medium px-2 py-1 text-left flex items-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" /> Logout
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <button onClick={() => { loginAsStudent(); setIsMobileMenuOpen(false); }} className="w-full text-center bg-gray-50 text-gray-800 font-medium py-2 rounded-lg border border-gray-200">
-                  Login as Student
-                </button>
-                <button onClick={() => { loginAsAdmin(); setIsMobileMenuOpen(false); }} className="w-full text-center bg-indigo-600 text-white font-medium py-2 rounded-lg">
-                  Login as Admin
-                </button>
-              </div>
-            )}
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <button 
+                    onClick={() => { loginAsStudent(); setIsMobileMenuOpen(false); }}
+                    className="w-full text-center font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-xl transition-colors"
+                  >
+                    Login (Student)
+                  </button>
+                  <button 
+                    onClick={() => { loginAsAdmin(); setIsMobileMenuOpen(false); }}
+                    className="w-full text-center font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-3 rounded-xl transition-colors"
+                  >
+                    Login (Admin)
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
