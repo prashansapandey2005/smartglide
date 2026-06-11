@@ -52,67 +52,20 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-300 pt-16">
-      <div className="flex h-[calc(100vh-64px)]">
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
         
-        {/* Main Viewer Area */}
-        <div className="flex-1 overflow-y-auto bg-black flex flex-col">
-          {/* Header */}
-          <div className="p-4 flex items-center gap-4 bg-gray-900 border-b border-gray-800 shrink-0">
-            <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg">
-              <ArrowLeft className="w-5 h-5" />
+        {/* Sidebar Syllabus (Now on the left) */}
+        <div className="w-full md:w-80 lg:w-96 bg-gray-900 border-r border-gray-800 md:h-[calc(100vh-64px)] md:overflow-y-auto shrink-0 flex flex-col order-2 md:order-1">
+          <div className="p-6 border-b border-gray-800 sticky top-0 bg-gray-900 z-10 flex flex-col gap-4">
+            <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
+              <ArrowLeft className="w-4 h-4" /> Back to course page
             </Link>
-            <h1 className="text-lg font-bold text-white line-clamp-1">{course.title}</h1>
-          </div>
-
-          {/* Secure Content Viewer */}
-          <div className="flex-1 relative bg-gray-900 flex flex-col border-b border-gray-800">
-            {activeContent ? (
-              activeContent.type === "VIDEO" ? (
-                <div className="flex-1 relative aspect-video flex items-center justify-center max-h-[70vh]">
-                  <video 
-                    src={activeContent.url} 
-                    controls 
-                    controlsList="nodownload" 
-                    onContextMenu={(e) => e.preventDefault()}
-                    className="w-full h-full object-contain bg-black"
-                    autoPlay
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gray-800/50">
-                  <FileText className="w-24 h-24 text-orange-500 mb-6" />
-                  <h2 className="text-2xl font-bold text-white mb-2">{activeContent.title}</h2>
-                  <p className="text-gray-400 mb-8 max-w-md">This is a PDF document. You can download it below to view it.</p>
-                  <a href={activeContent.url} download={`${activeContent.title}.pdf`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors">
-                    <Download className="w-5 h-5" /> Download PDF Notes
-                  </a>
-                </div>
-              )
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-gray-800/50">
-                <PlayCircle className="w-20 h-20 mb-4 opacity-50" />
-                <p className="font-medium text-lg">No Content Selected</p>
-                <p className="text-sm mt-2 opacity-75">Select a video or notes from the syllabus sidebar to begin.</p>
+            <h3 className="font-bold text-white text-lg">{course.title}</h3>
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <div className="flex-1 bg-gray-800 rounded-full h-1.5">
+                <div className="bg-indigo-500 h-1.5 rounded-full" style={{ width: "10%" }}></div>
               </div>
-            )}
-          </div>
-
-          {/* Details */}
-          <div className="p-8 bg-gray-900 shrink-0">
-            <h2 className="text-2xl font-bold text-white mb-4">
-              {activeContent ? activeContent.title : "Select content to view details"}
-            </h2>
-          </div>
-        </div>
-
-        {/* Sidebar Syllabus */}
-        <div className="w-80 lg:w-96 bg-gray-900 border-l border-gray-800 overflow-y-auto shrink-0 hidden md:block">
-          <div className="p-6 border-b border-gray-800 sticky top-0 bg-gray-900 z-10">
-            <h3 className="font-bold text-white mb-2">Course Content</h3>
-            <div className="w-full bg-gray-800 rounded-full h-1.5 mb-2">
-              <div className="bg-indigo-500 h-1.5 rounded-full" style={{ width: "10%" }}></div>
+              <span>10%</span>
             </div>
           </div>
           
@@ -120,7 +73,7 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
             {course.sections.map((section: any, idx: number) => (
               <div key={section.id} className="bg-gray-900">
                 <div className="p-4 font-bold text-sm text-gray-300 bg-gray-800/50 border-b border-gray-800/50">
-                  Section {idx + 1}: {section.title}
+                  {idx + 1}. {section.title}
                 </div>
                 <div className="divide-y divide-gray-800/30">
                   {section.topics.map((topic: any) => {
@@ -165,6 +118,58 @@ export default function LearnPage({ params }: { params: Promise<{ id: string }> 
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Main Viewer Area (Now on the right) */}
+        <div className="flex-1 bg-[#1c1d21] flex flex-col order-1 md:order-2 md:h-[calc(100vh-64px)]">
+          {/* Header */}
+          <div className="p-4 flex items-center justify-between bg-[#1c1d21] border-b border-gray-800 shrink-0">
+            <button className="text-gray-400 hover:text-white text-sm font-medium">&lt; Previous</button>
+            <h1 className="text-sm font-bold text-gray-300 line-clamp-1">{activeContent?.title || "Video Player"}</h1>
+            <button className="text-gray-400 hover:text-white text-sm font-medium">Next &gt;</button>
+          </div>
+
+          {/* Secure Content Viewer */}
+          <div className="flex-1 relative bg-gray-900 flex flex-col border-b border-gray-800">
+            {activeContent ? (
+              activeContent.type === "VIDEO" ? (
+                <div className="flex-1 relative aspect-video flex items-center justify-center max-h-[70vh]">
+                  <video 
+                    src={activeContent.url} 
+                    controls 
+                    controlsList="nodownload" 
+                    onContextMenu={(e) => e.preventDefault()}
+                    className="w-full h-full object-contain bg-black"
+                    autoPlay
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gray-800/50">
+                  <FileText className="w-24 h-24 text-orange-500 mb-6" />
+                  <h2 className="text-2xl font-bold text-white mb-2">{activeContent.title}</h2>
+                  <p className="text-gray-400 mb-8 max-w-md">This is a PDF document. You can download it below to view it.</p>
+                  <a href={activeContent.url} download={`${activeContent.title}.pdf`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors">
+                    <Download className="w-5 h-5" /> Download PDF Notes
+                  </a>
+                </div>
+              )
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-gray-800/50">
+                <PlayCircle className="w-20 h-20 mb-4 opacity-50" />
+                <p className="font-medium text-lg">No Content Selected</p>
+                <p className="text-sm mt-2 opacity-75">Select a video or notes from the syllabus sidebar to begin.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Details footer if needed, or remove it */}
+          <div className="p-6 bg-[#1c1d21] shrink-0 border-t border-gray-800">
+            <h2 className="text-xl font-bold text-white">
+              {activeContent ? activeContent.title : "Select content to view details"}
+            </h2>
           </div>
         </div>
 
