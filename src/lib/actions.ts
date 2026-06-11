@@ -72,6 +72,7 @@ export async function createCourse(data: any) {
       tags: JSON.stringify(data.tags),
       features: JSON.stringify(data.features),
       imageUrl: data.imageUrl,
+      syllabusUrl: data.syllabusUrl,
     }
   });
   revalidatePath("/admin");

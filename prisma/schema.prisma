@@ -26,6 +26,7 @@ model Course {
   originalPrice    Float
   instructor       String
   imageUrl         String?      @db.Text // Internal path to private image or public URL
+  syllabusUrl      String?      @db.Text // Path to syllabus PDF
   tags             String       // Stored as JSON string array
   features         String       @db.Text // Stored as JSON string array
   createdAt        DateTime     @default(now())

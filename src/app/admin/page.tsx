@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [courseForm, setCourseForm] = useState({
-    title: "", description: "", longDescription: "", price: "0", originalPrice: "0", instructor: "", tags: "", features: ""
+    title: "", description: "", longDescription: "", price: "0", originalPrice: "0", instructor: "", tags: "", features: "", syllabusUrl: ""
   });
 
   useEffect(() => {
@@ -126,24 +126,49 @@ export default function AdminDashboard() {
                 </div>
                 <input placeholder="Tags (comma separated)" className="w-full p-3 border rounded-xl" value={courseForm.tags} onChange={e => setCourseForm({...courseForm, tags: e.target.value})} />
                 <textarea placeholder="Features (one per line)" className="w-full p-3 border rounded-xl" value={courseForm.features} onChange={e => setCourseForm({...courseForm, features: e.target.value})} />
-                <div>
-                  <label className="block text-sm font-medium mb-2">Course Cover Image (Optional)</label>
-                  {coverImageUrl ? (
-                    <div className="flex items-center gap-4">
-                      <img src={coverImageUrl} alt="Cover" className="h-16 w-16 object-cover rounded" />
-                      <button type="button" onClick={() => setCoverImageUrl(null)} className="text-sm text-red-500">Remove</button>
-                    </div>
-                  ) : (
-                    <UploadButton
-                      endpoint="courseImage"
-                      onClientUploadComplete={(res) => {
-                        if (res?.[0]) setCoverImageUrl(res[0].url);
-                      }}
-                      onUploadError={(error: Error) => {
-                        alert(`ERROR! ${error.message}`);
-                      }}
-                    />
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700">Course Cover Image (Optional)</label>
+                    {coverImageUrl ? (
+                      <div className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <img src={coverImageUrl} alt="Cover" className="h-12 w-16 object-cover rounded" />
+                        <button type="button" onClick={() => setCoverImageUrl(null)} className="text-sm font-medium text-red-600 hover:text-red-700">Remove</button>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+                        <UploadButton
+                          endpoint="courseImage"
+                          onClientUploadComplete={(res) => {
+                            if (res?.[0]) setCoverImageUrl(res[0].url);
+                          }}
+                          onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                          appearance={{ button: { background: '#4f46e5' } }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700">Course Syllabus PDF (Optional)</label>
+                    {courseForm.syllabusUrl ? (
+                      <div className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <FileText className="w-8 h-8 text-orange-500" />
+                        <span className="text-sm text-gray-600 flex-1 truncate">Syllabus uploaded</span>
+                        <button type="button" onClick={() => setCourseForm({...courseForm, syllabusUrl: ""})} className="text-sm font-medium text-red-600 hover:text-red-700">Remove</button>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+                        <UploadButton
+                          endpoint="coursePdf"
+                          onClientUploadComplete={(res) => {
+                            if (res?.[0]) setCourseForm({...courseForm, syllabusUrl: res[0].url});
+                          }}
+                          onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                          appearance={{ button: { background: '#f97316' } }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex gap-4 mt-8">

@@ -98,10 +98,22 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             
             {/* Syllabus */}
             <section className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                <FileText className="w-6 h-6 text-indigo-600" />
-                Course Syllabus
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <FileText className="w-6 h-6 text-indigo-600" />
+                  Course Syllabus
+                </h2>
+                {course.syllabusUrl && (
+                  <a 
+                    href={course.syllabusUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl font-medium transition-colors border border-indigo-100"
+                  >
+                    <FileText className="w-4 h-4" /> Download PDF
+                  </a>
+                )}
+              </div>
               
               <div className="space-y-6">
                 {course.sections.map((section: any, idx: number) => (
