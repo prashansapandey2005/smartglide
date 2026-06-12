@@ -35,8 +35,8 @@ export async function POST(req: Request) {
     // Send the email
     try {
       await sendOTP(email, otp);
-    } catch (mailError) {
-      console.warn("Failed to send email. In development, use the console logged OTP.");
+    } catch (mailError: any) {
+      console.warn("Failed to send email. Detailed error:", mailError);
       console.log(`[DEV OTP] Your OTP for ${email} is: ${otp}`);
       // In development, we don't fail if SMTP isn't set up yet, we just log it.
     }
