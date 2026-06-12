@@ -12,10 +12,23 @@ model User {
   email            String       @unique
   password         String?
   name             String?
+  stream           String?
+  year             String?
+  institution      String?
+  phone            String?
+  whatsapp         String?
   role             String       @default("student") // 'student' or 'admin'
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   enrollments      Enrollment[]
+}
+
+model OTPVerification {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Course {
