@@ -7,27 +7,10 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, otp, stream, year, institution, phone, whatsapp } = await req.json();
+    const { name, email, password, stream, year, institution, phone, whatsapp } = await req.json();
 
-    if (!name || !email || !password || !otp) {
+    if (!name || !email || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
-
-    // Verify OTP
-    const otpRecord = await prisma.oTPVerification.findUnique({
-      where: { email },
-    });
-
-    if (!otpRecord) {
-      return NextResponse.json({ error: "No OTP found for this email. Please request a new one." }, { status: 400 });
-    }
-
-    if (otpRecord.otp !== otp) {
-      return NextResponse.json({ error: "Invalid OTP" }, { status: 400 });
-    }
-
-    if (otpRecord.expiresAt < new Date()) {
-      return NextResponse.json({ error: "OTP has expired. Please request a new one." }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -52,11 +35,6 @@ export async function POST(req: Request) {
         whatsapp,
         role: "student",
       },
-    });
-
-    // Delete OTP after successful registration
-    await prisma.oTPVerification.delete({
-      where: { email },
     });
 
     const token = await signToken({
